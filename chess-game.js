@@ -30,10 +30,44 @@ const initializeGame = (sio, socket) => {
   gameSocket.on("createNewGame", createNewGame);
 
   // User joins gameRoom after going to a URL with '/game/:gameId'
-  gameSocket.on("playerJoinGame", playerJoinsGame);
+  gameSocket.on("wantsToJoin", wantsToJoin);
+
+  gameSocket.on("playerJoinsGame", playerJoinsGame);
 
   gameSocket.on("send data", sendData);
 };
+
+function wantsToJoin(gameId) {
+  console.log("joing " + io.sockets.adapter.rooms);
+  /**
+   * Joins the given socket to a session with it's gameId
+   */
+
+  // A reference to the player's Socket.IO socket object
+  //var sock = this;
+
+  // Look up the room ID in the Socket.IO manager object.
+  var room = io.sockets.adapter.rooms.get(gameId);
+  console.log(room);
+
+  // If the room exists...
+  if (room === undefined) {
+    this.emit("status", "This game session does not exist.");
+    return;
+  }
+  if (room.size < 2) {
+    // Join the room
+    //sock.join(idData.gameId);
+
+    //console.log(room.size);
+    this.emit("match found");
+    //io.sockets.in(idData.gameId).emit("start game", idData.address);
+
+  } else {
+    // Otherwise, send an error message back to the player.
+    this.emit("status", "There are already 2 people playing in this room.");
+  }
+}
 
 function playerJoinsGame(idData) {
   console.log("joing " + io.sockets.adapter.rooms);
@@ -50,7 +84,7 @@ function playerJoinsGame(idData) {
 
   // If the room exists...
   if (room === undefined) {
-    this.emit("status", "This game session does not exist.");
+    this.emit("status1", "This game session does not exist.");
     return;
   }
   if (room.size < 2) {
@@ -61,13 +95,14 @@ function playerJoinsGame(idData) {
 
     io.sockets.in(idData.gameId).emit("start game", idData.address);
 
-    // Emit an event notifying the clients that the player has joined the room.
-    io.sockets.in(idData.gameId).emit("playerJoinedRoom", idData);
   } else {
     // Otherwise, send an error message back to the player.
-    this.emit("status", "There are already 2 people playing in this room.");
+    this.emit("status1", "There are already 2 people playing in this room.");
   }
 }
+
+
+
 
 function createNewGame(gameId) {
   /*      // Return the Room ID (gameId) and the socket ID (mySocketId) to the browser client
