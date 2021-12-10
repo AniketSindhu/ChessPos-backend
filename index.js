@@ -12,6 +12,6 @@ io.on("connection", (socket) => {
   chessGame.initializeGame(io, socket);
 });
 
-http.listen(4000, function () {
+http.listen(process.env.PORT || 4000, function () {
   console.log("listening on *:4000");
 });
